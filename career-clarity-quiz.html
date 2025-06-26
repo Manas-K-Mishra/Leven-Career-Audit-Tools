@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Career Clarity Quiz</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f9f9f9;
+      padding: 2rem;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      background: #fff;
+      margin: auto;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.05);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .question {
+      margin-bottom: 1.5rem;
+    }
+    label {
+      display: block;
+      margin: 0.5rem 0;
+    }
+    button {
+      display: block;
+      margin: 2rem auto 0;
+      background: #0077cc;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 2rem;
+      padding: 1rem;
+      border-left: 4px solid #0077cc;
+      background: #eaf4ff;
+      border-radius: 8px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>✨ Career Clarity Quiz</h2>
+
+    <form id="quizForm">
+      <div class="question">
+        <strong>1. What excites you most?</strong>
+        <label><input type="radio" name="q1" value="data"> Working with numbers & insights</label>
+        <label><input type="radio" name="q1" value="design"> Creating beautiful and useful things</label>
+        <label><input type="radio" name="q1" value="marketing"> Telling stories and promoting ideas</label>
+        <label><input type="radio" name="q1" value="tech"> Building systems and automating tasks</label>
+      </div>
+
+      <div class="question">
+        <strong>2. What's your go-to tool?</strong>
+        <label><input type="radio" name="q2" value="data"> Excel or SQL</label>
+        <label><input type="radio" name="q2" value="design"> Canva or Figma</label>
+        <label><input type="radio" name="q2" value="marketing"> Instagram or Notion</label>
+        <label><input type="radio" name="q2" value="tech"> VS Code or Zapier</label>
+      </div>
+
+      <div class="question">
+        <strong>3. Your ideal work day includes...</strong>
+        <label><input type="radio" name="q3" value="data"> Making dashboards or reports</label>
+        <label><input type="radio" name="q3" value="design"> Sketching ideas or layouts</label>
+        <label><input type="radio" name="q3" value="marketing"> Brainstorming campaigns</label>
+        <label><input type="radio" name="q3" value="tech"> Writing scripts or workflows</label>
+      </div>
+
+      <div class="question">
+        <strong>4. Pick a strength:</strong>
+        <label><input type="radio" name="q4" value="data"> Analytical thinking</label>
+        <label><input type="radio" name="q4" value="design"> Visual creativity</label>
+        <label><input type="radio" name="q4" value="marketing"> Communication & influence</label>
+        <label><input type="radio" name="q4" value="tech"> Problem-solving logic</label>
+      </div>
+
+      <div class="question">
+        <strong>5. What outcome satisfies you most?</strong>
+        <label><input type="radio" name="q5" value="data"> Discovering actionable insights</label>
+        <label><input type="radio" name="q5" value="design"> Making things users love</label>
+        <label><input type="radio" name="q5" value="marketing"> Making an idea go viral</label>
+        <label><input type="radio" name="q5" value="tech"> Creating a process that saves time</label>
+      </div>
+
+      <button type="submit">Reveal My Career Style</button>
+    </form>
+
+    <div class="result" id="resultBox"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('quizForm');
+    const resultBox = document.getElementById('resultBox');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const scores = { data: 0, design: 0, marketing: 0, tech: 0 };
+
+      for (let entry of formData.entries()) {
+        scores[entry[1]]++;
+      }
+
+      const topChoice = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
+
+      let message = '';
+      switch(topChoice) {
+        case 'data':
+          message = "📊 You are an Analytical Strategist — you thrive on logic, patterns, and evidence. Careers in Data, Finance, or Analytics may suit you.";
+          break;
+        case 'design':
+          message = "🎨 You are a Creative Builder — your strength is visual thinking and user-centric design. Explore UX/UI, Branding, or Product Design.";
+          break;
+        case 'marketing':
+          message = "📣 You are a Story-Driven Communicator — you bring ideas to life through words, campaigns, and media. Marketing, Content, or Growth roles await you.";
+          break;
+        case 'tech':
+          message = "⚙️ You are a Systems Thinker — you love building workflows and solving technical problems. Look into Software, Automation, or No-Code Development.";
+          break;
+      }
+
+      resultBox.innerHTML = `<strong>Result:</strong> <br>${message}`;
+      resultBox.style.display = 'block';
+    });
+  </script>
+</body>
+</html>
