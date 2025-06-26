@@ -64,7 +64,7 @@
     <h2>✨ Career Clarity Quiz</h2>
 
     <form id="quizForm">
-      <div class="question active" data-step="1">
+      <div class="question active">
         <strong>1. What excites you most?</strong>
         <label><input type="radio" name="q1" value="data"> Working with numbers & insights</label>
         <label><input type="radio" name="q1" value="design"> Creating beautiful and useful things</label>
@@ -72,7 +72,7 @@
         <label><input type="radio" name="q1" value="tech"> Building systems and automating tasks</label>
       </div>
 
-      <div class="question" data-step="2">
+      <div class="question">
         <strong>2. What's your go-to tool?</strong>
         <label><input type="radio" name="q2" value="data"> Excel or SQL</label>
         <label><input type="radio" name="q2" value="design"> Canva or Figma</label>
@@ -80,7 +80,7 @@
         <label><input type="radio" name="q2" value="tech"> VS Code or Zapier</label>
       </div>
 
-      <div class="question" data-step="3">
+      <div class="question">
         <strong>3. Your ideal work day includes...</strong>
         <label><input type="radio" name="q3" value="data"> Making dashboards or reports</label>
         <label><input type="radio" name="q3" value="design"> Sketching ideas or layouts</label>
@@ -88,7 +88,7 @@
         <label><input type="radio" name="q3" value="tech"> Writing scripts or workflows</label>
       </div>
 
-      <div class="question" data-step="4">
+      <div class="question">
         <strong>4. Pick a strength:</strong>
         <label><input type="radio" name="q4" value="data"> Analytical thinking</label>
         <label><input type="radio" name="q4" value="design"> Visual creativity</label>
@@ -96,7 +96,7 @@
         <label><input type="radio" name="q4" value="tech"> Problem-solving logic</label>
       </div>
 
-      <div class="question" data-step="5">
+      <div class="question">
         <strong>5. What outcome satisfies you most?</strong>
         <label><input type="radio" name="q5" value="data"> Discovering actionable insights</label>
         <label><input type="radio" name="q5" value="design"> Making things users love</label>
@@ -133,7 +133,8 @@
     }
 
     nextBtn.addEventListener('click', () => {
-      const selected = questions[currentStep].querySelector('input[type=\"radio\"]:checked');
+      const currentQuestion = questions[currentStep];
+      const selected = currentQuestion.querySelector('input[type="radio"]:checked');
       if (!selected) {
         alert('Please select an option before proceeding.');
         return;
@@ -154,7 +155,6 @@
     form.addEventListener('submit', function(e) {
       e.preventDefault();
 
-      // Validate all questions are answered
       for (let i = 1; i <= 5; i++) {
         if (!form[`q${i}`].value) {
           alert('Please answer all questions before submitting.');
@@ -172,18 +172,18 @@
       const topChoice = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
 
       let message = '';
-      switch(topChoice) {
+      switch (topChoice) {
         case 'data':
-          message = \"📊 You are an Analytical Strategist — you thrive on logic, patterns, and evidence. Careers in Data, Finance, or Analytics may suit you.\";
+          message = "📊 You are an Analytical Strategist — you thrive on logic, patterns, and evidence. Careers in Data, Finance, or Analytics may suit you.";
           break;
         case 'design':
-          message = \"🎨 You are a Creative Builder — your strength is visual thinking and user-centric design. Explore UX/UI, Branding, or Product Design.\";
+          message = "🎨 You are a Creative Builder — your strength is visual thinking and user-centric design. Explore UX/UI, Branding, or Product Design.";
           break;
         case 'marketing':
-          message = \"📣 You are a Story-Driven Communicator — you bring ideas to life through words, campaigns, and media. Marketing, Content, or Growth roles await you.\";
+          message = "📣 You are a Story-Driven Communicator — you bring ideas to life through words, campaigns, and media. Marketing, Content, or Growth roles await you.";
           break;
         case 'tech':
-          message = \"⚙️ You are a Systems Thinker — you love building workflows and solving technical problems. Look into Software, Automation, or No-Code Development.\";
+          message = "⚙️ You are a Systems Thinker — you love building workflows and solving technical problems. Look into Software, Automation, or No-Code Development.";
           break;
       }
 
