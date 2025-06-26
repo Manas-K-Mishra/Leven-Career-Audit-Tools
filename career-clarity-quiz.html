@@ -57,12 +57,33 @@
       justify-content: space-between;
       margin-top: 1rem;
     }
+
+    /* Intro screen */
+    .intro-screen {
+      text-align: center;
+      padding: 2rem;
+    }
+    .intro-screen img {
+      max-width: 100%;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+    }
+    #quizForm {
+      display: none;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>✨ Career Clarity Quiz</h2>
+    <!-- Welcome Screen -->
+    <div class="intro-screen" id="introScreen">
+      <img src="https://via.placeholder.com/600x200?text=Career+Clarity+Quiz" alt="Welcome Image" />
+      <h2>Discover Your Career Thinking Style</h2>
+      <p>Answer 5 quick questions to find your dominant career mindset.</p>
+      <button onclick="startQuiz()">Start Quiz</button>
+    </div>
 
+    <!-- Quiz Form -->
     <form id="quizForm">
       <div class="question active">
         <strong>1. What excites you most?</strong>
@@ -116,6 +137,11 @@
   </div>
 
   <script>
+    function startQuiz() {
+      document.getElementById("introScreen").style.display = "none";
+      document.getElementById("quizForm").style.display = "block";
+    }
+
     const form = document.getElementById('quizForm');
     const questions = document.querySelectorAll('.question');
     const resultBox = document.getElementById('resultBox');
