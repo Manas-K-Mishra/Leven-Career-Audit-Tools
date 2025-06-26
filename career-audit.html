@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Career Audit Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+      padding: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      background-color: #0056d2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #e9f7ef;
+      border-left: 5px solid #28a745;
+      border-radius: 8px;
+    }
+    .score {
+      font-size: 1.1rem;
+      margin: 0.5rem 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🔍 Career Audit Tool</h2>
+    <p>Paste your LinkedIn "About" section or Resume Summary below:</p>
+    <textarea id="inputText" placeholder="Paste your summary here..."></textarea>
+    <button onclick="auditCareerText()">Audit My Career Profile</button>
+    <div id="output" class="result" style="display:none;"></div>
+  </div>
+
+  <script>
+    function auditCareerText() {
+      const text = document.getElementById('inputText').value.trim();
+      if (!text) return alert("Please paste your career summary first.");
+
+      const wordCount = text.split(/\s+/).length;
+      const actionVerbs = ["led", "created", "developed", "improved", "managed", "built", "launched", "executed", "designed"];
+      const keywords = ["data", "strategy", "team", "project", "growth", "design", "impact", "user", "technology"];
+      
+      let verbMatches = actionVerbs.filter(v => text.toLowerCase().includes(v)).length;
+      let keywordMatches = keywords.filter(k => text.toLowerCase().includes(k)).length;
+
+      const clarityScore = wordCount < 250 ? "✅ Concise" : "⚠️ Try shortening it";
+      const keywordScore = keywordMatches > 4 ? "✅ Good use of industry terms" : "⚠️ Add more relevant keywords";
+      const verbScore = verbMatches > 3 ? "✅ Strong action language" : "⚠️ Use more action verbs";
+
+      const feedback = `
+        <h3>📊 Career Summary Audit Results:</h3>
+        <p class='score'><strong>Word Count:</strong> ${wordCount} — ${clarityScore}</p>
+        <p class='score'><strong>Action Verbs:</strong> ${verbMatches} matches — ${verbScore}</p>
+        <p class='score'><strong>Keywords:</strong> ${keywordMatches} matches — ${keywordScore}</p>
+        <p>💡 <strong>Suggestions:</strong> Use specific metrics (e.g., "Increased revenue by 20%"), highlight key tools, and avoid vague buzzwords.</p>
+      `;
+
+      document.getElementById('output').innerHTML = feedback;
+      document.getElementById('output').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
