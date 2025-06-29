@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Skill Readiness Tracker - Leven Squad</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f9f9f9;
+      color: #333;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+    }
+    h2 {
+      text-align: center;
+      color: #0b3d26;
+      margin-bottom: 0.25rem;
+    }
+    h4 {
+      text-align: center;
+      font-weight: normal;
+      color: #666;
+      margin-top: 0;
+    }
+    .logo {
+      display: block;
+      margin: 0 auto 1rem;
+      max-height: 80px;
+      border-radius: 8px;
+    }
+    select, button {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #0b3d26;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    .skills {
+      display: none;
+      margin-top: 1rem;
+    }
+    .skill-group {
+      margin-bottom: 1.5rem;
+    }
+    label {
+      display: block;
+      margin: 0.5rem 0 0.25rem;
+      font-weight: 600;
+    }
+    .feedback, .jobmatch {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #e8f5e9;
+      border-left: 4px solid #0b3d26;
+      border-radius: 8px;
+    }
+    canvas {
+      margin-top: 2rem;
+    }
+    .actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="https://i.imgur.com/NKPfs0O.jpg" alt="Leven Squad" class="logo" />
+    <h2>Skill Readiness Tracker</h2>
+    <h4>Careers & Curiosity</h4>
+    
+    <p>Select your career cluster to assess your current readiness:</p>
+    
+    <select id="careerCluster">
+      <option value="">-- Choose a Career Cluster --</option>
+      <option value="data">Data & Analytics</option>
+      <option value="tech">Tech, Coding & Automation</option>
+      <option value="cyber">Cybersecurity & IT Ops</option>
+      <option value="design">UX/UI & Design</option>
+      <option value="marketing">Marketing & Brand</option>
+      <option value="content">Content & Media</option>
+      <option value="product">Product Management</option>
+      <option value="finance">Finance & Banking</option>
+      <option value="people">People, Learning & HR</option>
+    </select>
+
+    <div id="skillForm" class="skills"></div>
+
+    <div class="actions">
+      <button id="generateBtn" style="display:none;">Generate Skill Chart</button>
+      <button id="resetBtn" style="display:none; background:#888;">Reset & Start Over</button>
+    </div>
+
+    <canvas id="skillChart" width="400" height="400" style="display:none;"></canvas>
+    <div id="feedback" class="feedback" style="display:none;"></div>
+    <div id="jobmatch" class="jobmatch" style="display:none;"></div>
+  <script>
+    const skillData = {
+      data: ["Excel/Sheets", "SQL", "Data Viz", "Statistics", "Business Analysis"],
+      tech: ["HTML/CSS/JS", "Automation Tools", "APIs", "Git", "No-Code Builders"],
+      cyber: ["Network Basics", "Risk Assessment", "Threat Detection", "Security Tools", "Compliance"],
+      design: ["Figma/Sketch", "User Research", "Wireframing", "UI Principles", "Design Systems"],
+      marketing: ["SEO", "Social Media", "Analytics", "Campaign Planning", "Copywriting"],
+      content: ["Video Editing", "Scriptwriting", "Brand Voice", "Distribution", "Storytelling"],
+      product: ["User Journey", "MVP Building", "Roadmapping", "Cross-Team Comm", "Market Research"],
+      finance: ["Financial Modeling", "Excel Analysis", "FinTech Tools", "Banking Basics", "Risk Management"],
+      people: ["Instructional Design", "Talent Dev", "HR Tech", "L&D Strategy", "Communication"]
+    };
+
+    const jobRoles = {
+      data: ["Data Analyst", "Business Intelligence Associate", "Analytics Intern"],
+      tech: ["Frontend Developer", "No-Code Web Builder", "Automation Assistant"],
+      cyber: ["SOC Analyst", "IT Security Trainee", "Risk Ops Assistant"],
+      design: ["UI Designer", "UX Research Intern", "Mobile Wireframer"],
+      marketing: ["Digital Marketing Exec", "Growth Analyst", "Content Marketer"],
+      content: ["Content Strategist", "Video Script Editor", "Social Media Writer"],
+      product: ["Product Analyst", "Associate PM", "Roadmapping Intern"],
+      finance: ["Credit Analyst", "Fintech Ops Intern", "Excel Modeler"],
+      people: ["L&D Coordinator", "People Ops Associate", "HR Tech Assistant"]
+    };
+
+    const clusterMessages = {
+      data: "Strong analytical reasoning is key. Focus on data storytelling, SQL fluency, and creating business-impact dashboards.",
+      tech: "Build real projects using code or no-code tools. Employers want creators who can ship usable apps and automate tasks.",
+      cyber: "Awareness is everything. Start with network monitoring, master basic compliance frameworks, then shadow real threat models.",
+      design: "Good design is invisible but intentional. Focus on layout consistency, component libraries, and user interviews.",
+      marketing: "Track more than you post. Mix creativity with funnel metrics — think conversion, not just virality.",
+      content: "Modern content is dynamic. Pair strong narrative with editing, repurposing, and distribution via channels.",
+      product: "Product thinking blends empathy with priorities. Hone stakeholder communication, MVP shaping, and feedback loops.",
+      finance: "Accuracy meets speed. Model financial decisions with logic, automate wherever possible, and justify with data.",
+      people: "Learning is the new currency. Build L&D plans with ROI, test content formats, and understand career pathing logic."
+    };
+
+    const careerCluster = document.getElementById("careerCluster");
+    const skillForm = document.getElementById("skillForm");
+    const generateBtn = document.getElementById("generateBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const feedback = document.getElementById("feedback");
+    const jobmatch = document.getElementById("jobmatch");
+
+    careerCluster.addEventListener("change", function () {
+      const selected = this.value;
+      if (!selected) return;
+
+      skillForm.innerHTML = "";
+      const skills = skillData[selected];
+
+      skills.forEach(skill => {
+        const group = document.createElement("div");
+        group.className = "skill-group";
+        group.innerHTML = `
+          <label>${skill}</label>
+          <select>
+            <option value="1">Beginner</option>
+            <option value="2">Intermediate</option>
+            <option value="3">Advanced</option>
+          </select>
+        `;
+        skillForm.appendChild(group);
+      });
+
+      skillForm.style.display = "block";
+      generateBtn.style.display = "inline-block";
+      resetBtn.style.display = "inline-block";
+      feedback.style.display = "none";
+      jobmatch.style.display = "none";
+      document.getElementById("skillChart").style.display = "none";
+    });
+
+    generateBtn.addEventListener("click", function () {
+      const skillLabels = [];
+      const skillScores = [];
+
+      document.querySelectorAll(".skill-group").forEach(group => {
+        const label = group.querySelector("label").innerText;
+        const score = parseInt(group.querySelector("select").value);
+        skillLabels.push(label);
+        skillScores.push(score);
+      });
+
+      const ctx = document.getElementById("skillChart").getContext("2d");
+      document.getElementById("skillChart").style.display = "block";
+
+      if (window.skillRadar) window.skillRadar.destroy();
+
+      window.skillRadar = new Chart(ctx, {
+        type: "radar",
+        data: {
+          labels: skillLabels,
+          datasets: [{
+            label: "Your Skill Readiness",
+            data: skillScores,
+            backgroundColor: "rgba(11, 61, 38, 0.2)",
+            borderColor: "#0b3d26",
+            borderWidth: 2,
+            pointBackgroundColor: "#0b3d26"
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            r: {
+              min: 0,
+              max: 3,
+              ticks: { stepSize: 1, color: "#666" },
+              grid: { color: "#ddd" },
+              pointLabels: { font: { size: 14 } }
+            }
+          }
+        }
+      });
+
+      const avg = skillScores.reduce((a, b) => a + b) / skillScores.length;
+      const cluster = careerCluster.value;
+
+      let levelMsg = "", match = "";
+
+      if (avg <= 1.5) {
+        levelMsg = "You're at the foundation stage. Focus on consistent daily learning — 30-60 mins with guided projects.";
+        match = "You're ~40–50% ready for internship or junior roles.";
+      } else if (avg <= 2.4) {
+        levelMsg = "You’re building momentum! Start applying skills in real-world formats like micro-projects or freelance gigs.";
+        match = "You're ~60–70% ready for junior to mid-level roles.";
+      } else {
+        levelMsg = "You’re job-ready! Consider building a public portfolio, mentoring peers, or leveling up via specialization.";
+        match = "You're ~80–90% ready for core professional roles.";
+      }
+
+      feedback.innerHTML = `
+        <strong>Guidance:</strong> ${clusterMessages[cluster]}<br><br>
+        <strong>Prescriptive Tip:</strong> ${levelMsg}
+      `;
+
+      jobmatch.innerHTML = `
+        <strong>Job Match Estimate:</strong> ${match}<br><br>
+        <strong>Ideal Roles:</strong> ${jobRoles[cluster].join(', ')}
+      `;
+
+      feedback.style.display = "block";
+      jobmatch.style.display = "block";
+    });
+
+    resetBtn.addEventListener("click", function () {
+      skillForm.innerHTML = "";
+      skillForm.style.display = "none";
+      generateBtn.style.display = "none";
+      resetBtn.style.display = "none";
+      feedback.style.display = "none";
+      jobmatch.style.display = "none";
+      document.getElementById("skillChart").style.display = "none";
+      careerCluster.value = "";
+    });
+  </script>
+</div>
+</body>
+</html>
