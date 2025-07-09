@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Leven Squad Career Compass</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter (used in Tailwind config) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- React, ReactDOM, and Babel for in-browser JSX compilation -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        /* Custom styles for the font */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Ensure canvas is responsive */
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body class="font-inter">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // IMPORTANT: In a real-world application, you would use a build tool (like Webpack or Vite)
+        // to compile your React code. This in-browser Babel compilation is for demonstration
+        // and local file execution convenience only.
+
+        // Questions for the quiz
+        const allQuestions = [
+          // SQL Questions (4)
+          { skill: "SQL", text: "Given two tables, `orders` and `customers`, how would you retrieve all customer names and their total order amounts, including customers who haven't placed any orders?" },
+          { skill: "SQL", text: "Describe a scenario where you would use a `HAVING` clause instead of a `WHERE` clause in SQL." },
+          { skill: "SQL", text: "Explain the concept of a window function (e.g., ROW_NUMBER(), RANK()) and provide an example of its use." },
+          { skill: "SQL", text: "What steps would you take to troubleshoot a slow-running SQL query?" },
+
+          // Excel Questions (3)
+          { skill: "Excel", text: "You have a list of sales transactions and need to categorize them based on a separate lookup table. Which Excel functions would you use and why?" },
+          { skill: "Excel", text: "How would you use Excel to summarize sales data by product category and region, showing total sales and average sales per transaction?" },
+          { skill: "Excel", text: "Describe how you would ensure data consistency and prevent errors when users input data into a shared Excel workbook." },
+
+          // Visualization (Viz) Questions (3)
+          { skill: "Viz", text: "You need to show the trend of website visitors over the past year and identify any seasonal patterns. What type of chart would you choose and why?" },
+          { skill: "Viz", text: "Beyond just creating charts, how do you ensure your dashboards tell a compelling story and are actionable for business users?" },
+          { skill: "Viz", text: "Describe your experience with a specific BI tool (e.g., Tableau, Power BI, Looker Studio) in connecting to data sources and publishing reports." },
+
+          // Statistics (Stats) Questions (3)
+          { skill: "Stats", text: "Explain the difference between descriptive and inferential statistics, and provide an example of when you'd use each." },
+          { skill: "Stats", text: "You run an A/B test on a new website feature. What metrics would you track, and how would you determine if the new feature is statistically significant?" },
+          { skill: "Stats", text: "How would you approach forecasting sales for the next quarter, considering historical data and potential external factors?" },
+
+          // Business Acumen (BA) Questions (3)
+          { skill: "BA", text: "Describe a time you had to gather data requirements from a non-technical stakeholder. How did you ensure you understood their true needs?" },
+          { skill: "BA", text: "What are Key Performance Indicators (KPIs), and how do you define effective KPIs for a specific business objective (e.g., customer retention)?" },
+          { skill: "BA", text: "How do you translate complex analytical findings into clear, actionable recommendations for business leaders?" },
+
+          // Communication Questions (3) - New Skill Category
+          { skill: "Communication", text: "Imagine you've found a critical insight in the data. How would you present this finding to a senior executive who has limited time and technical background?" },
+          { skill: "Communication", text: "Describe a time you had to explain a complex technical concept (e.g., a specific statistical model) to a non-technical audience. What approach you took?" },
+          { skill: "Communication", text: "Why is documentation important in data analysis projects, and what kind of documentation do you typically create?" }
+        ];
+
+        // Main App Component
+        const App = () => {
+          const [currentQ, setCurrentQ] = React.useState(0);
+          const [shuffledQuestions, setShuffledQuestions] = React.useState([]);
+          const [skillScores, setSkillScores] = React.useState({ SQL: 0, Excel: 0, Viz: 0, Stats: 0, BA: 0, Communication: 0 });
+          const [skillMax, setSkillMax] = React.useState({ SQL: 0, Excel: 0, Viz: 0, Stats: 0, BA: 0, Communication: 0 });
+          const [quizStarted, setQuizStarted] = React.useState(false);
+          const [reportGenerated, setReportGenerated] = React.useState(false);
+          const [reportData, setReportData] = React.useState(null);
+          const [loading, setLoading] = React.useState(false);
+          const [error, setError] = React.useState(null);
+
+          // Fisher-Yates shuffle algorithm
+          const shuffleArray = (array) => {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+          };
+
+          // Function to update the progress bar
+          const updateProgress = () => {
+            const totalQuestions = shuffledQuestions.length > 0 ? shuffledQuestions.length : allQuestions.length;
+            const progress = (currentQ / totalQuestions) * 100;
+            return progress;
+          };
+
+          // Handle quiz start
+          const startQuiz = () => {
+            setShuffledQuestions(shuffleArray(allQuestions));
+            setQuizStarted(true);
+          };
+
+          // Handle next question or submit quiz
+          const handleNext = async () => {
+            const selected = document.querySelector("input[name='q']:checked");
+            if (!selected) {
+              alert("Please select an option.");
+              return;
+            }
+
+            const val = parseInt(selected.value);
+            const skill = shuffledQuestions[currentQ].skill;
+
+            setSkillScores(prevScores => ({
+              ...prevScores,
+              [skill]: prevScores[skill] + val
+            }));
+
+            setSkillMax(prevMax => ({
+              ...prevMax,
+              [skill]: prevMax[skill] + 2
+            }));
+
+            // Only increment question, report generation is handled by a separate useEffect
+            if (currentQ < shuffledQuestions.length - 1) {
+              setCurrentQ(prevQ => prevQ + 1);
+            } else {
+              // If it's the last question, just update currentQ to trigger the report useEffect
+              setCurrentQ(prevQ => prevQ + 1); // This will make currentQ === shuffledQuestions.length
+            }
+          };
+
+          // New useEffect to trigger report generation when quiz is completed
+          React.useEffect(() => {
+            console.log("Report trigger useEffect:", { currentQ, shuffledQuestionsLength: shuffledQuestions.length, reportGenerated, loading });
+            // Only proceed if all questions are answered, there are questions, report not generated, and not already loading.
+            if (currentQ === shuffledQuestions.length && shuffledQuestions.length > 0 && !reportGenerated && !loading) {
+              console.log("Conditions met: Triggering report generation...");
+              setLoading(true); // Set loading here, just before calling generateReport
+              generateReport();
+            }
+          }, [currentQ, shuffledQuestions.length, reportGenerated, loading, generateReport]);
+
+          // Generate the report using Gemini API
+          const generateReport = React.useCallback(async () => { // Wrapped in useCallback
+            const labels = Object.keys(skillScores);
+            const values = labels.map(k => parseFloat((skillScores[k] / skillMax[k]) * 10).toFixed(1));
+
+            const skillMap = {};
+            labels.forEach((k, i) => skillMap[k] = parseFloat(values[i]));
+
+            const prompt = `
+              Based on the following skill scores (out of 10), provide a comprehensive career report.
+              Skill Scores: ${JSON.stringify(skillMap)}
+
+              Please generate a JSON object with the following structure:
+              {
+                "summary": "A concise summary of the user's overall strengths and areas for improvement.",
+                "suggestedRoles": [
+                  {
+                    "title": "Job Role Title",
+                    "level": "Entry/Mid/Senior",
+                    "matchPercentage": "Number (0-100)",
+                    "keySkills": ["Skill1", "Skill2"],
+                    "skillGaps": ["Gap1", "Gap2"],
+                    "advice": "Short advice (e.g., Ready to Apply, Needs Focused Prep, Foundation Needed)",
+                    "suggestedDuration": "e.g., 1-2 weeks, 3-4 weeks, 6-8 weeks",
+                    "projectIdea": "A specific project idea to practice skills",
+                    "toolsUsed": ["Tool1", "Tool2"],
+                    "interviewQuestions": ["Provide 3-5 specific and relevant interview questions for this role and skill level, covering technical, behavioral, and problem-solving aspects."],
+                    "roadmap": "Provide a detailed, actionable roadmap for skill improvement, including specific topics to study, resources (e.g., online courses, books), and practical exercises or mini-projects for each identified skill gap. Break it down into clear, achievable steps over the suggested duration."
+                  }
+                ]
+              }
+              Provide at least 3 relevant job role suggestions. Ensure the 'matchPercentage' is a number.
+            `;
+
+            try {
+              const chatHistory = [];
+              chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+              const payload = {
+                contents: chatHistory,
+                generationConfig: {
+                  responseMimeType: "application/json",
+                  responseSchema: {
+                    type: "OBJECT",
+                    properties: {
+                      "summary": { "type": "STRING" },
+                      "suggestedRoles": {
+                        "type": "ARRAY",
+                        "items": {
+                          type: "OBJECT",
+                          properties: {
+                            "title": { "type": "STRING" },
+                            "level": { "type": "STRING" },
+                            "matchPercentage": { "type": "NUMBER" },
+                            "keySkills": { "type": "ARRAY", "items": { "type": "STRING" } },
+                            "skillGaps": { "type": "ARRAY", "items": { "type": "STRING" } },
+                            "advice": { "type": "STRING" },
+                            "suggestedDuration": { "type": "STRING" },
+                            "projectIdea": { "type": "STRING" },
+                            "toolsUsed": { "type": "ARRAY", "items": { "type": "STRING" } },
+                            "interviewQuestions": { "type": "ARRAY", "items": { "type": "STRING" } },
+                            "roadmap": { "type": "STRING" }
+                          },
+                          required: ["title", "level", "matchPercentage", "keySkills", "skillGaps", "advice", "suggestedDuration", "projectIdea", "toolsUsed", "interviewQuestions", "roadmap"]
+                        }
+                      }
+                    },
+                    required: ["summary", "suggestedRoles"]
+                  }
+                }
+              };
+
+              // !!! IMPORTANT: Replace "" with your actual Gemini API Key here!
+              // You can get one from Google AI Studio (https://aistudio.google.com/app/apikey)
+              // As long as your usage stays within the free tier limits, you won't be charged.
+              const apiKey = "AIzaSyCLPDEEBMuQEyVcQDrJTmZxqDSwGIs_RG8"; // <--- YOUR GEMINI API KEY HAS BEEN ADDED HERE
+              if (!apiKey) {
+                  setError("Gemini API Key is missing. Please add your API key to the code for dynamic reports.");
+                  setLoading(false);
+                  return;
+              }
+
+              const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+              const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+
+              const result = await response.json();
+
+              if (result.candidates && result.candidates.length > 0 &&
+                  result.candidates[0].content && result.candidates[0].content.parts &&
+                  result.candidates[0].content.parts.length > 0) {
+                const jsonString = result.candidates[0].content.parts[0].text;
+                const parsedJson = JSON.parse(jsonString);
+                setReportData(parsedJson);
+                setReportGenerated(true);
+              } else {
+                setError("Failed to generate report. Unexpected API response structure.");
+                console.error("API response:", result);
+              }
+            } catch (err) {
+              console.error("Error generating report:", err);
+              setError("Failed to generate report. Please try again later. Check console for details.");
+            } finally {
+              setLoading(false); // Ensure loading is always set to false
+            }
+          }, [skillScores, skillMax, reportGenerated, setLoading, setError, setReportData, setReportGenerated]);
+
+
+          // Render the radar chart after report data is available
+          React.useEffect(() => {
+            if (reportGenerated && reportData) {
+              const ctx = document.getElementById("radarChart");
+              if (ctx) {
+                const labels = Object.keys(skillScores);
+                const values = labels.map(k => parseFloat((skillScores[k] / skillMax[k]) * 10).toFixed(1));
+
+                if (window.myRadarChart) {
+                  window.myRadarChart.destroy();
+                }
+
+                window.myRadarChart = new Chart(ctx.getContext("2d"), {
+                  type: "radar",
+                  data: {
+                    labels,
+                    datasets: [{
+                      label: "Skill Score (out of 10)",
+                      data: values,
+                      backgroundColor: "rgba(11, 61, 38, 0.2)",
+                      borderColor: "#0b3d26",
+                      borderWidth: 2
+                    }]
+                  },
+                  options: {
+                    scales: {
+                      r: {
+                        suggestedMin: 0,
+                        suggestedMax: 10,
+                        ticks: { stepSize: 2 },
+                        pointLabels: {
+                          font: {
+                            size: 14
+                          }
+                        }
+                      }
+                    },
+                    plugins: {
+                      legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                          font: {
+                            size: 14
+                          }
+                        }
+                      }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                  }
+                });
+              }
+            }
+          }, [reportGenerated, reportData, skillScores, skillMax]);
+
+          // Reset function
+          const resetQuiz = () => {
+            setCurrentQ(0);
+            setShuffledQuestions([]);
+            setSkillScores({ SQL: 0, Excel: 0, Viz: 0, Stats: 0, BA: 0, Communication: 0 });
+            setSkillMax({ SQL: 0, Excel: 0, Viz: 0, Stats: 0, BA: 0, Communication: 0 });
+            setQuizStarted(false);
+            setReportGenerated(false);
+            setReportData(null);
+            setLoading(false);
+            setError(null);
+          };
+
+          return (
+            <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 font-inter">
+              <div className="container max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-8 md:p-12">
+                <img
+                  src="https://manas-k-mishra.github.io/Leven-Career-Audit-Tools/leven-logo.jpg"
+                  alt="Leven Squad"
+                  className="mx-auto mb-6 max-h-20 rounded-lg"
+                  onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/80x80/0b3d26/ffffff?text=LOGO"; }}
+                />
+                <h2 className="text-3xl font-bold text-center text-green-900 mb-2">Leven Squad Career Compass</h2>
+                <h4 className="text-lg text-center text-gray-600 mb-6">Data & Analytics Diagnostic</h4>
+
+                {!quizStarted && !reportGenerated && (
+                  <div className="text-center">
+                    <p className="text-gray-700 mb-6">This diagnostic helps map your job-readiness across essential skills, providing a deeper insight into your strengths and areas for growth.</p>
+                    <button
+                      onClick={startQuiz}
+                      className="bg-green-800 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                    >
+                      Start Quiz
+                    </button>
+                  </div>
+                )}
+
+                {quizStarted && !reportGenerated && currentQ < shuffledQuestions.length && (
+                  <>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+                      <div
+                        className="bg-green-800 h-2.5 rounded-full transition-all duration-300 ease-in-out"
+                        style={{ width: `${updateProgress()}%` }}
+                      ></div>
+                    </div>
+
+                    <div key={currentQ} className="question-block mb-8">
+                      <p className="text-xl font-semibold text-gray-800 mb-4">Q{currentQ + 1}. {shuffledQuestions[currentQ]?.text}</p>
+                      <div className="option-group flex flex-col space-y-3">
+                        <label className="inline-flex items-center text-lg text-gray-700 cursor-pointer">
+                          <input type="radio" name="q" value="2" className="form-radio h-5 w-5 text-green-600 focus:ring-green-500 rounded-full" />
+                          <span className="ml-3">I can confidently explain and apply this.</span>
+                        </label>
+                        <label className="inline-flex items-center text-lg text-gray-700 cursor-pointer">
+                          <input type="radio" name="q" value="1" className="form-radio h-5 w-5 text-green-600 focus:ring-green-500 rounded-full" />
+                          <span className="ml-3">I have some theoretical understanding or limited practical experience.</span>
+                        </label>
+                        <label className="inline-flex items-center text-lg text-gray-700 cursor-pointer">
+                          <input type="radio" name="q" value="0" className="form-radio h-5 w-5 text-green-600 focus:ring-green-500 rounded-full" />
+                          <span className="ml-3">I am not familiar with this concept/task.</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={handleNext}
+                      className="w-full bg-green-800 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                      disabled={loading}
+                    >
+                      {loading ? 'Generating Report...' : 'Next'}
+                    </button>
+                  </>
+                )}
+
+                {loading && (
+                  <div className="text-center mt-8">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-800 mx-auto"></div>
+                    <p className="text-gray-600 mt-4">Analyzing your skills and generating a personalized report...</p>
+                  </div>
+                )}
+
+                {error && (
+                  <div className="text-center mt-8 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                    <p>{error}</p>
+                  </div>
+                )}
+
+                {reportGenerated && reportData && reportData.suggestedRoles && (
+                  <div className="report mt-8">
+                    <h3 className="text-2xl font-bold text-center text-green-900 mb-6">📊 Your Smart Report</h3>
+
+                    <p className="text-gray-700 text-center mb-8 leading-relaxed">{reportData.summary}</p>
+
+                    <div className="chart-container mb-10 h-80">
+                      <canvas id="radarChart"></canvas>
+                    </div>
+
+                    {reportData?.suggestedRoles?.map((role, index) => (
+                      <div key={index} className="jobcard bg-gray-50 p-6 border-l-4 border-green-800 rounded-lg shadow-sm mb-8">
+                        <h4 className="text-xl font-bold text-green-800 mb-2">{role.title} – {role.matchPercentage}% Match</h4>
+                        <p className="text-gray-700 mb-1"><strong>Level:</strong> {role.level}</p>
+                        <p className="text-gray-700 mb-1"><strong>Key Skills:</strong> {role.keySkills.join(", ")}</p>
+                        <p className="text-gray-700 mb-1"><strong>Gaps:</strong> {role.skillGaps.length ? role.skillGaps.join(", ") : "None"}</p>
+                        <p className="text-gray-700 mb-1"><strong>Advice:</strong> {role.advice}</p>
+                        <p className="text-gray-700 mb-1"><strong>Suggested Duration:</strong> {role.suggestedDuration}</p>
+                        <p className="text-gray-700 mb-1"><strong>Project Idea:</strong> {role.projectIdea}</p>
+                        <p className="text-700 mb-1"><strong>Tools Used:</strong> {role.toolsUsed.join(", ")}</p>
+                        <p className="text-gray-700 mb-1">
+                          <strong>Interview Questions ({role.level}):</strong>
+                        </p>
+                        <ul className="list-disc list-inside mt-1 text-sm mb-4">
+                          {role.interviewQuestions.map((q, qIndex) => (
+                            <li key={qIndex}>{q}</li>
+                          ))}
+                        </ul>
+                        <div className="roadmap bg-yellow-50 p-4 border-l-4 border-yellow-600 rounded-md text-sm text-yellow-800">
+                          <p><strong>Roadmap for Improvement:</strong></p>
+                          <p>{role.roadmap}</p>
+                        </div>
+                      </div>
+                    ))}
+
+                    <button
+                      onClick={resetQuiz}
+                      className="w-full bg-gray-600 hover:bg-gray-500 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 mt-8"
+                    >
+                      🔁 Reset & Start Over
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        };
+
+        // Render the React App ONLY after the window is fully loaded
+        window.onload = () => {
+            ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+        };
+    </script>
+</body>
+</html>
