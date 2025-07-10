@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Career Clarity Quiz</title>
   <style>
     body {
@@ -12,7 +12,7 @@
       color: #333;
     }
     .container {
-      max-width: 600px;
+      max-width: 700px;
       background: #fff;
       margin: auto;
       padding: 2rem;
@@ -62,8 +62,7 @@
       padding: 2rem;
     }
     .intro-screen img {
-      max-width: 100%;
-      border-radius: 12px;
+      max-height: 80px;
       margin-bottom: 1rem;
     }
     #quizForm {
@@ -73,54 +72,72 @@
 </head>
 <body>
   <div class="container">
-    <!-- Welcome Screen -->
     <div class="intro-screen" id="introScreen">
-      <img src="https://dummyimage.com/600x200/0b3d26/ffffff&text=Career+Clarity+Quiz" alt="Career Clarity Quiz Banner" />
+      <img src="https://manas-k-mishra.github.io/Leven-Career-Audit-Tools/leven-logo.jpg" alt="Leven Squad Logo" />
       <h2>Discover Your Career Thinking Style</h2>
-      <p>Answer 5 quick questions to find your dominant career mindset.</p>
+      <p>Answer 6 quick questions to find your dominant career mindset.</p>
       <button onclick="startQuiz()">Start Quiz</button>
     </div>
 
-    <!-- Quiz Form -->
     <form id="quizForm">
       <div class="question active">
-        <strong>1. What excites you most?</strong>
-        <label><input type="radio" name="q1" value="data"> Working with numbers & insights</label>
-        <label><input type="radio" name="q1" value="design"> Creating beautiful and useful things</label>
-        <label><input type="radio" name="q1" value="marketing"> Telling stories and promoting ideas</label>
-        <label><input type="radio" name="q1" value="tech"> Building systems and automating tasks</label>
+        <strong>1. What excites you the most?</strong>
+        <label><input type="radio" name="q1" value="analyst"> Finding patterns in messy data</label>
+        <label><input type="radio" name="q1" value="builder"> Building systems that just work</label>
+        <label><input type="radio" name="q1" value="designer"> Designing things users love</label>
+        <label><input type="radio" name="q1" value="marketer"> Crafting compelling messages</label>
+        <label><input type="radio" name="q1" value="leader"> Leading projects and motivating people</label>
+        <label><input type="radio" name="q1" value="operator"> Improving workflows for speed and results</label>
       </div>
 
       <div class="question">
-        <strong>2. What's your go-to tool?</strong>
-        <label><input type="radio" name="q2" value="data"> Excel or SQL</label>
-        <label><input type="radio" name="q2" value="design"> Canva or Figma</label>
-        <label><input type="radio" name="q2" value="marketing"> Instagram or Notion</label>
-        <label><input type="radio" name="q2" value="tech"> VS Code or Zapier</label>
+        <strong>2. Your natural strength is...</strong>
+        <label><input type="radio" name="q2" value="analyst"> Analytical thinking</label>
+        <label><input type="radio" name="q2" value="builder"> Systems thinking</label>
+        <label><input type="radio" name="q2" value="designer"> Visual creativity</label>
+        <label><input type="radio" name="q2" value="marketer"> Persuasive communication</label>
+        <label><input type="radio" name="q2" value="leader"> Strategic planning</label>
+        <label><input type="radio" name="q2" value="operator"> Operational efficiency</label>
       </div>
 
       <div class="question">
-        <strong>3. Your ideal work day includes...</strong>
-        <label><input type="radio" name="q3" value="data"> Making dashboards or reports</label>
-        <label><input type="radio" name="q3" value="design"> Sketching ideas or layouts</label>
-        <label><input type="radio" name="q3" value="marketing"> Brainstorming campaigns</label>
-        <label><input type="radio" name="q3" value="tech"> Writing scripts or workflows</label>
+        <strong>3. If you had a 1-week project, you'd prefer...</strong>
+        <label><input type="radio" name="q3" value="analyst"> Analyzing a dataset to find insights</label>
+        <label><input type="radio" name="q3" value="builder"> Building a simple tool or automation</label>
+        <label><input type="radio" name="q3" value="designer"> Designing a new app screen</label>
+        <label><input type="radio" name="q3" value="marketer"> Creating a pitch deck for a new product</label>
+        <label><input type="radio" name="q3" value="leader"> Managing the whole team and plan</label>
+        <label><input type="radio" name="q3" value="operator"> Setting up workflows and deadlines</label>
       </div>
 
       <div class="question">
-        <strong>4. Pick a strength:</strong>
-        <label><input type="radio" name="q4" value="data"> Analytical thinking</label>
-        <label><input type="radio" name="q4" value="design"> Visual creativity</label>
-        <label><input type="radio" name="q4" value="marketing"> Communication & influence</label>
-        <label><input type="radio" name="q4" value="tech"> Problem-solving logic</label>
+        <strong>4. You feel most confident when...</strong>
+        <label><input type="radio" name="q4" value="analyst"> Spotting trends others miss</label>
+        <label><input type="radio" name="q4" value="builder"> Building something that works end-to-end</label>
+        <label><input type="radio" name="q4" value="designer"> Making things beautiful and intuitive</label>
+        <label><input type="radio" name="q4" value="marketer"> Pitching your idea to others</label>
+        <label><input type="radio" name="q4" value="leader"> Leading a team toward a vision</label>
+        <label><input type="radio" name="q4" value="operator"> Delivering on time without chaos</label>
       </div>
 
       <div class="question">
-        <strong>5. What outcome satisfies you most?</strong>
-        <label><input type="radio" name="q5" value="data"> Discovering actionable insights</label>
-        <label><input type="radio" name="q5" value="design"> Making things users love</label>
-        <label><input type="radio" name="q5" value="marketing"> Making an idea go viral</label>
-        <label><input type="radio" name="q5" value="tech"> Creating a process that saves time</label>
+        <strong>5. Your ideal job description says...</strong>
+        <label><input type="radio" name="q5" value="analyst"> “Turns data into decisions”</label>
+        <label><input type="radio" name="q5" value="builder"> “Builds internal tools or platforms”</label>
+        <label><input type="radio" name="q5" value="designer"> “Designs engaging experiences”</label>
+        <label><input type="radio" name="q5" value="marketer"> “Grows the product through marketing”</label>
+        <label><input type="radio" name="q5" value="leader"> “Drives business strategy”</label>
+        <label><input type="radio" name="q5" value="operator"> “Runs the show behind the scenes”</label>
+      </div>
+
+      <div class="question">
+        <strong>6. Which sounds most like you?</strong>
+        <label><input type="radio" name="q6" value="analyst"> I ask “why?” and love charts</label>
+        <label><input type="radio" name="q6" value="builder"> I think in logic and flows</label>
+        <label><input type="radio" name="q6" value="designer"> I notice layout and balance</label>
+        <label><input type="radio" name="q6" value="marketer"> I write to persuade</label>
+        <label><input type="radio" name="q6" value="leader"> I guide people and plans</label>
+        <label><input type="radio" name="q6" value="operator"> I make processes better</label>
       </div>
 
       <div class="navigation">
@@ -179,39 +196,23 @@
     form.addEventListener('submit', function(e) {
       e.preventDefault();
 
-      for (let i = 1; i <= 5; i++) {
-        if (!form[`q${i}`].value) {
-          alert('Please answer all questions before submitting.');
-          return;
-        }
-      }
-
+      const scores = { analyst: 0, builder: 0, designer: 0, marketer: 0, leader: 0, operator: 0 };
       const formData = new FormData(form);
-      const scores = { data: 0, design: 0, marketing: 0, tech: 0 };
-
       for (let entry of formData.entries()) {
         scores[entry[1]]++;
       }
+      const top = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
 
-      const topChoice = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
+      const messages = {
+        analyst: "📊 <strong>Insight Architect</strong> — You're a logic-first thinker who thrives on clarity, numbers, and evidence. Careers in Data, Research, or Business Analytics fit you well.",
+        builder: "🛠 <strong>System Engineer</strong> — You love constructing useful systems, workflows, and automations. Ideal for Software, Product Ops, or Dev Tools roles.",
+        designer: "🎨 <strong>Experience Creator</strong> — You bring ideas to life visually. UX/UI, Visual Design, or Creative Tech may be your jam.",
+        marketer: "📣 <strong>Growth Catalyst</strong> — You’re great at stories, branding, and campaigns. Think Growth Marketing, Content, or Community.",
+        leader: "🧭 <strong>Strategic Captain</strong> — You love guiding people, making decisions, and setting direction. Great for Product, Strategy, or PM roles.",
+        operator: "⚙️ <strong>Execution Maestro</strong> — You bring order to chaos. Ops, Project Management, and GTM Execution roles suit you best."
+      };
 
-      let message = '';
-      switch (topChoice) {
-        case 'data':
-          message = "📊 You are an Analytical Strategist — you thrive on logic, patterns, and evidence. Careers in Data, Finance, or Analytics may suit you.";
-          break;
-        case 'design':
-          message = "🎨 You are a Creative Builder — your strength is visual thinking and user-centric design. Explore UX/UI, Branding, or Product Design.";
-          break;
-        case 'marketing':
-          message = "📣 You are a Story-Driven Communicator — you bring ideas to life through words, campaigns, and media. Marketing, Content, or Growth roles await you.";
-          break;
-        case 'tech':
-          message = "⚙️ You are a Systems Thinker — you love building workflows and solving technical problems. Look into Software, Automation, or No-Code Development.";
-          break;
-      }
-
-      resultBox.innerHTML = `<strong>Result:</strong><br>${message}`;
+      resultBox.innerHTML = `<strong>Result:</strong><br>${messages[top]}`;
       resultBox.style.display = 'block';
     });
 
