@@ -4,14 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Leven Squad Career Compass</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts - Inter (used in Tailwind config) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- React, ReactDOM, and Babel for in-browser JSX compilation -->
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -57,7 +53,7 @@
           // Statistics (Stats) Questions (3)
           { skill: "Stats", text: "Explain the difference between descriptive and inferential statistics, and provide an example of when you'd use each." },
           { skill: "Stats", text: "You run an A/B test on a new website feature. What metrics would you track, and how would you determine if the new feature is statistically significant?" },
-          { skill: "Stats", text: "How would you approach forecasting sales for the next quarter, considering historical data and potential external factors?" },
+          { skill: "Stats", "text": "How would you approach forecasting sales for the next quarter, considering historical data and potential external factors?" },
 
           // Business Acumen (BA) Questions (3)
           { skill: "BA", text: "Describe a time you had to gather data requirements from a non-technical stakeholder. How did you ensure you understood their true needs?" },
@@ -336,7 +332,7 @@
                   onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/80x80/0b3d26/ffffff?text=LOGO"; }}
                 />
                 <h2 className="text-3xl font-bold text-center text-green-900 mb-2">Leven Squad Career Compass</h2>
-                <h4 className="text-lg text-center text-gray-600 mb-6">Data & Analytics Diagnostic</h4>
+                <h4 className="text-lg text-center text-gray-600 mb-6"><strong>Data & Analytics Diagnostic</strong></h4>
 
                 {!quizStarted && !reportGenerated && (
                   <div className="text-center">
@@ -455,3 +451,4 @@
     </script>
 </body>
 </html>
+```
