@@ -10,12 +10,13 @@
       background: #f9f9f9;
       padding: 2rem;
       color: #333;
+      margin: 0;
     }
     .container {
       max-width: 800px;
       width: 100%;
       background: #fff;
-      margin: auto;
+      margin: 0 auto;
       padding: 2rem;
       border-radius: 12px;
       box-shadow: 0 0 15px rgba(0,0,0,0.05);
@@ -231,8 +232,7 @@
     <canvas id="resultChart"></canvas>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   <script>
     // Randomization functions
     function shuffleArray(array) {
@@ -404,20 +404,11 @@
           <p><strong>Resources:</strong> ${careerPaths[primary].resources.map(r => `<a href="https://www.${r.split(' ')[0].toLowerCase()}.com" target="_blank">${r}</a>`).join(", ")}</p>
           <p><strong>Your Aspiration:</strong> ${aspiration}</p>
           <p><strong>Reflection:</strong> Does this path align with your goals? Consider how your aspiration (“${aspiration}”) fits with ${careerPaths[primary].title} or ${careerPaths[secondary].title} roles.</p>
-          <button id="downloadBtn">Download Career Action Plan</button>
         `;
         resultBox.innerHTML = resultText;
         resultBox.style.display = 'block';
         form.style.display = 'none';
         console.log("Results displayed successfully");
-
-        // Attach event listener to the download button
-        const downloadBtn = document.getElementById('downloadBtn');
-        if (downloadBtn) {
-          downloadBtn.addEventListener('click', () => downloadActionPlan(primary, secondary, aspiration));
-        } else {
-          console.error("Download button not found in resultBox");
-        }
 
         try {
           new Chart(document.getElementById('resultChart'), {
@@ -457,132 +448,6 @@
       console.log("Submit button click event triggered");
       handleSubmission();
     });
-
-    function downloadActionPlan(primary, secondary, aspiration) {
-      console.log("Download Action Plan button clicked");
-      try {
-        if (!window.jspdf || !window.jspdf.jsPDF) {
-          throw new Error("jsPDF library not loaded");
-        }
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const logoUrl = 'https://manas-k-mishra.github.io/Leven-Career-Audit-Tools/leven-logo.jpg';
-        const logoWidth = 50;
-        const logoHeight = 20;
-        const logoX = (pageWidth - logoWidth) / 2;
-        let yPos = 20;
-
-        const careerPaths = {
-          analyst: {
-            title: "Insight Architect",
-            description: "You thrive on data and clarity. Careers like Data Scientist, Business Analyst, or Researcher suit you.",
-            roles: ["Entry: Data Analyst", "Advanced: Data Scientist, Machine Learning Engineer"],
-            skills: ["Learn Python/R", "Take a Data Science course (e.g., Coursera)", "Practice SQL"],
-            resources: ["Coursera Data Science", "Kaggle competitions"]
-          },
-          builder: {
-            title: "System Engineer",
-            description: "You love building solutions. Software Engineer, DevOps, or Product Developer roles are ideal.",
-            roles: ["Entry: Junior Developer", "Advanced: Software Architect, CTO"],
-            skills: ["Learn JavaScript/Python", "Build a GitHub portfolio", "Explore cloud platforms"],
-            resources: ["freeCodeCamp", "AWS certifications"]
-          },
-          designer: {
-            title: "Experience Creator",
-            description: "You create user-friendly designs. UX/UI Designer or Graphic Designer roles fit you.",
-            roles: ["Entry: UI Designer", "Advanced: UX Lead, Creative Director"],
-            skills: ["Learn Figma", "Study design principles", "Build a portfolio"],
-            resources: ["Dribbble for inspiration", "Coursera UX Design"]
-          },
-          marketer: {
-            title: "Growth Catalyst",
-            description: "You excel at communication. Growth Marketing, Content Creator, or PR roles are your path.",
-            roles: ["Entry: Marketing Coordinator", "Advanced: CMO, Brand Strategist"],
-            skills: ["Learn SEO", "Practice copywriting", "Study analytics"],
-            resources: ["HubSpot Academy", "Google Analytics certification"]
-          },
-          leader: {
-            title: "Strategic Captain",
-            description: "You guide teams and strategy. Product Manager, Entrepreneur, or Executive roles suit you.",
-            roles: ["Entry: Associate PM", "Advanced: CEO, Strategy Director"],
-            skills: ["Study leadership frameworks", "Practice public speaking", "Learn finance"],
-            resources: ["Harvard Business Review", "Toastmasters"]
-          },
-          operator: {
-            title: "Execution Maestro",
-            description: "You optimize processes. Operations Manager or Project Manager roles are ideal.",
-            roles: ["Entry: Operations Coordinator", "Advanced: COO, Supply Chain Manager"],
-            skills: ["Learn project management tools", "Study Lean Six Sigma", "Practice time management"],
-            resources: ["PMI certifications", "Trello/Asana tutorials"]
-          }
-        };
-
-        // Function to generate PDF content
-        function generatePDFContent() {
-          doc.setFontSize(16);
-          doc.text("Career Clarity Quest - Action Plan", pageWidth / 2, yPos, { align: 'center' });
-          yPos += 10;
-          doc.setLineWidth(0.5);
-          doc.line(20, yPos, pageWidth - 20, yPos);
-          yPos += 10;
-
-          doc.setFontSize(12);
-          doc.text(`Primary Career Path: ${careerPaths[primary].title}`, 20, yPos);
-          yPos += 7;
-          doc.text(`Description: ${careerPaths[primary].description}`, 20, yPos, { maxWidth: pageWidth - 40 });
-          yPos += 10;
-          doc.text(`Recommended Roles: ${careerPaths[primary].roles.join(", ")}`, 20, yPos, { maxWidth: pageWidth - 40 });
-          yPos += 10;
-          doc.text(`Skills to Develop: ${careerPaths[primary].skills.join(", ")}`, 20, yPos, { maxWidth: pageWidth - 40 });
-          yPos += 10;
-          doc.text(`Resources: ${careerPaths[primary].resources.join(", ")}`, 20, yPos, { maxWidth: pageWidth - 40 });
-          yPos += 15;
-
-          doc.text(`Secondary Career Path: ${careerPaths[secondary].title}`, 20, yPos);
-          yPos += 7;
-          doc.text(`Description: ${careerPaths[secondary].description}`, 20, yPos, { maxWidth: pageWidth - 40 });
-          yPos += 10;
-          doc.text(`Recommended Roles: ${careerPaths[secondary].roles.join(", ")}`, 20, yPos, { maxWidth: pageWidth - 40 });
-          yPos += 10;
-          doc.text(`Skills to Develop: ${careerPaths[secondary].skills.join(", ")}`, 20, yPos, { maxWidth: pageWidth - 40 });
-          yPos += 10;
-          doc.text(`Resources: ${careerPaths[secondary].resources.join(", ")}`, 20, yPos, { maxWidth: pageWidth - 40 });
-          yPos += 15;
-
-          doc.text(`Your Aspiration: ${aspiration}`, 20, yPos, { maxWidth: pageWidth - 40 });
-          yPos += 10;
-          doc.text(`Reflection: Consider how your aspiration (“${aspiration}”) aligns with ${careerPaths[primary].title} or ${careerPaths[secondary].title} roles.`, 20, yPos, { maxWidth: pageWidth - 40 });
-
-          doc.save('Career_Action_Plan.pdf');
-          console.log("PDF downloaded successfully");
-        }
-
-        // Attempt to add logo
-        const img = new Image();
-        img.crossOrigin = 'Anonymous';
-        img.src = logoUrl;
-
-        img.onload = function () {
-          try {
-            doc.addImage(img, 'JPEG', logoX, yPos, logoWidth, logoHeight);
-            yPos += logoHeight + 10;
-            generatePDFContent();
-          } catch (error) {
-            console.error("Error adding logo to PDF:", error);
-            generatePDFContent(); // Proceed without logo
-          }
-        };
-
-        img.onerror = function () {
-          console.error("Error loading logo image:", logoUrl);
-          generatePDFContent(); // Proceed without logo
-        };
-      } catch (error) {
-        console.error("Error generating PDF:", error);
-        alert("Failed to generate PDF. Please check the console for details or try again.");
-      }
-    }
   </script>
 </body>
 </html>
