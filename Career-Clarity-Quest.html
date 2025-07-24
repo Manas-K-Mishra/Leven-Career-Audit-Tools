@@ -13,11 +13,13 @@
     }
     .container {
       max-width: 800px;
+      width: 100%;
       background: #fff;
       margin: auto;
       padding: 2rem;
       border-radius: 12px;
       box-shadow: 0 0 15px rgba(0,0,0,0.05);
+      box-sizing: border-box;
     }
     h2 {
       text-align: center;
@@ -43,6 +45,8 @@
       border-radius: 8px;
       font-size: 1rem;
       cursor: pointer;
+      min-width: 120px;
+      min-height: 44px;
     }
     .result {
       margin-top: 2rem;
@@ -84,6 +88,27 @@
     canvas {
       margin-top: 1rem;
       max-width: 100%;
+      max-height: 300px;
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 1rem;
+        max-width: 100%;
+      }
+      button {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        min-width: 120px;
+        min-height: 44px;
+      }
+      input[type="radio"] {
+        width: 20px;
+        height: 20px;
+        margin-right: 8px;
+      }
+      label {
+        font-size: 0.9rem;
+      }
     }
   </style>
 </head>
@@ -220,19 +245,16 @@
 
     function randomizeOptions() {
       const questions = document.querySelectorAll('.question');
-      for (let i = 0; i < 9; i++) { // Questions 1 to 9
+      for (let i = 0; i < 9; i++) {
         const question = questions[i];
         const labels = Array.from(question.querySelectorAll('label'));
         const shuffledLabels = shuffleArray(labels);
-        // Remove original labels
         labels.forEach(label => label.remove());
-        // Append shuffled labels after the question text (strong element)
         const questionText = question.querySelector('strong');
         shuffledLabels.forEach(label => question.insertBefore(label, questionText.nextSibling));
       }
     }
 
-    // Run randomization on page load
     document.addEventListener('DOMContentLoaded', randomizeOptions);
 
     function startQuiz(event) {
@@ -302,7 +324,6 @@
     function handleSubmission() {
       console.log("Submit button clicked");
       try {
-        // Simplified validation: check radio questions (1-9)
         for (let i = 0; i < questions.length - 1; i++) {
           const question = questions[i];
           const selected = question.querySelector('input[type="radio"]:checked');
@@ -383,14 +404,21 @@
           <p><strong>Resources:</strong> ${careerPaths[primary].resources.map(r => `<a href="https://www.${r.split(' ')[0].toLowerCase()}.com" target="_blank">${r}</a>`).join(", ")}</p>
           <p><strong>Your Aspiration:</strong> ${aspiration}</p>
           <p><strong>Reflection:</strong> Does this path align with your goals? Consider how your aspiration (“${aspiration}”) fits with ${careerPaths[primary].title} or ${careerPaths[secondary].title} roles.</p>
-          <button onclick="downloadActionPlan('${primary}', '${secondary}', '${aspiration}')">Download Career Action Plan</button>
+          <button id="downloadBtn">Download Career Action Plan</button>
         `;
         resultBox.innerHTML = resultText;
         resultBox.style.display = 'block';
         form.style.display = 'none';
         console.log("Results displayed successfully");
 
-        // Render chart
+        // Attach event listener to the download button
+        const downloadBtn = document.getElementById('downloadBtn');
+        if (downloadBtn) {
+          downloadBtn.addEventListener('click', () => downloadActionPlan(primary, secondary, aspiration));
+        } else {
+          console.error("Download button not found in resultBox");
+        }
+
         try {
           new Chart(document.getElementById('resultChart'), {
             type: 'pie',
@@ -419,7 +447,6 @@
       }
     }
 
-    // Attach submit handler to both form and button
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       console.log("Form submit event triggered");
@@ -432,170 +459,67 @@
     });
 
     function downloadActionPlan(primary, secondary, aspiration) {
+      console.log("Download Action Plan button clicked");
       try {
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+          throw new Error("jsPDF library not loaded");
+        }
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         const pageWidth = doc.internal.pageSize.getWidth();
         const logoUrl = 'https://manas-k-mishra.github.io/Leven-Career-Audit-Tools/leven-logo.jpg';
         const logoWidth = 50;
         const logoHeight = 20;
-        const logoX = (pageWidth - logoWidth) / 2; // Center logo
+        const logoX = (pageWidth - logoWidth) / 2;
         let yPos = 20;
 
-        // Load logo
-        const img = new Image();
-        img.crossOrigin = 'Anonymous';
-        img.src = logoUrl;
-
-        img.onload = function () {
-          try {
-            doc.addImage(img, 'JPEG', logoX, yPos, logoWidth, logoHeight);
-            yPos += logoHeight + 10;
-
-            // Define career paths
-            const careerPaths = {
-              analyst: {
-                title: "Insight Architect",
-                description: "You thrive on data and clarity. Careers like Data Scientist, Business Analyst, or Researcher suit you.",
-                roles: ["Entry: Data Analyst", "Advanced: Data Scientist, Machine Learning Engineer"],
-                skills: ["Learn Python/R", "Take a Data Science course (e.g., Coursera)", "Practice SQL"],
-                resources: ["Coursera Data Science", "Kaggle competitions"]
-              },
-              builder: {
-                title: "System Engineer",
-                description: "You love building solutions. Software Engineer, DevOps, or Product Developer roles are ideal.",
-                roles: ["Entry: Junior Developer", "Advanced: Software Architect, CTO"],
-                skills: ["Learn JavaScript/Python", "Build a GitHub portfolio", "Explore cloud platforms"],
-                resources: ["freeCodeCamp", "AWS certifications"]
-              },
-              designer: {
-                title: "Experience Creator",
-                description: "You create user-friendly designs. UX/UI Designer or Graphic Designer roles fit you.",
-                roles: ["Entry: UI Designer", "Advanced: UX Lead, Creative Director"],
-                skills: ["Learn Figma", "Study design principles", "Build a portfolio"],
-                resources: ["Dribbble for inspiration", "Coursera UX Design"]
-              },
-              marketer: {
-                title: "Growth Catalyst",
-                description: "You excel at communication. Growth Marketing, Content Creator, or PR roles are your path.",
-                roles: ["Entry: Marketing Coordinator", "Advanced: CMO, Brand Strategist"],
-                skills: ["Learn SEO", "Practice copywriting", "Study analytics"],
-                resources: ["HubSpot Academy", "Google Analytics certification"]
-              },
-              leader: {
-                title: "Strategic Captain",
-                description: "You guide teams and strategy. Product Manager, Entrepreneur, or Executive roles suit you.",
-                roles: ["Entry: Associate PM", "Advanced: CEO, Strategy Director"],
-                skills: ["Study leadership frameworks", "Practice public speaking", "Learn finance"],
-                resources: ["Harvard Business Review", "Toastmasters"]
-              },
-              operator: {
-                title: "Execution Maestro",
-                description: "You optimize processes. Operations Manager or Project Manager roles are ideal.",
-                roles: ["Entry: Operations Coordinator", "Advanced: COO, Supply Chain Manager"],
-                skills: ["Learn project management tools", "Study Lean Six Sigma", "Practice time management"],
-                resources: ["PMI certifications", "Trello/Asana tutorials"]
-              }
-            };
-
-            // Add content to PDF
-            doc.setFontSize(16);
-            doc.text("Career Clarity Quest - Action Plan", pageWidth / 2, yPos, { align: 'center' });
-            yPos += 10;
-            doc.setLineWidth(0.5);
-            doc.line(20, yPos, pageWidth - 20, yPos);
-            yPos += 10;
-
-            doc.setFontSize(12);
-            doc.text(`Primary Career Path: ${careerPaths[primary].title}`, 20, yPos);
-            yPos += 7;
-            doc.text(`Description: ${careerPaths[primary].description}`, 20, yPos, { maxWidth: pageWidth - 40 });
-            yPos += 10;
-            doc.text(`Recommended Roles: ${careerPaths[primary].roles.join(", ")}`, 20, yPos, { maxWidth: pageWidth - 40 });
-            yPos += 10;
-            doc.text(`Skills to Develop: ${careerPaths[primary].skills.join(", ")}`, 20, yPos, { maxWidth: pageWidth - 40 });
-            yPos += 10;
-            doc.text(`Resources: ${careerPaths[primary].resources.join(", ")}`, 20, yPos, { maxWidth: pageWidth - 40 });
-            yPos += 15;
-
-            doc.text(`Secondary Career Path: ${careerPaths[secondary].title}`, 20, yPos);
-            yPos += 7;
-            doc.text(`Description: ${careerPaths[secondary].description}`, 20, yPos, { maxWidth: pageWidth - 40 });
-            yPos += 10;
-            doc.text(`Recommended Roles: ${careerPaths[secondary].roles.join(", ")}`, 20, yPos, { maxWidth: pageWidth - 40 });
-            yPos += 10;
-            doc.text(`Skills to Develop: ${careerPaths[secondary].skills.join(", ")}`, 20, yPos, { maxWidth: pageWidth - 40 });
-            yPos += 10;
-            doc.text(`Resources: ${careerPaths[secondary].resources.join(", ")}`, 20, yPos, { maxWidth: pageWidth - 40 });
-            yPos += 15;
-
-            doc.text(`Your Aspiration: ${aspiration}`, 20, yPos, { maxWidth: pageWidth - 40 });
-            yPos += 10;
-            doc.text(`Reflection: Consider how your aspiration (“${aspiration}”) aligns with ${careerPaths[primary].title} or ${careerPaths[secondary].title} roles.`, 20, yPos, { maxWidth: pageWidth - 40 });
-
-            // Save PDF
-            doc.save('Career_Action_Plan.pdf');
-            console.log("PDF downloaded successfully");
-          } catch (error) {
-            console.error("Error generating PDF:", error);
-            alert("Error generating PDF. Please check the console for details.");
+        const careerPaths = {
+          analyst: {
+            title: "Insight Architect",
+            description: "You thrive on data and clarity. Careers like Data Scientist, Business Analyst, or Researcher suit you.",
+            roles: ["Entry: Data Analyst", "Advanced: Data Scientist, Machine Learning Engineer"],
+            skills: ["Learn Python/R", "Take a Data Science course (e.g., Coursera)", "Practice SQL"],
+            resources: ["Coursera Data Science", "Kaggle competitions"]
+          },
+          builder: {
+            title: "System Engineer",
+            description: "You love building solutions. Software Engineer, DevOps, or Product Developer roles are ideal.",
+            roles: ["Entry: Junior Developer", "Advanced: Software Architect, CTO"],
+            skills: ["Learn JavaScript/Python", "Build a GitHub portfolio", "Explore cloud platforms"],
+            resources: ["freeCodeCamp", "AWS certifications"]
+          },
+          designer: {
+            title: "Experience Creator",
+            description: "You create user-friendly designs. UX/UI Designer or Graphic Designer roles fit you.",
+            roles: ["Entry: UI Designer", "Advanced: UX Lead, Creative Director"],
+            skills: ["Learn Figma", "Study design principles", "Build a portfolio"],
+            resources: ["Dribbble for inspiration", "Coursera UX Design"]
+          },
+          marketer: {
+            title: "Growth Catalyst",
+            description: "You excel at communication. Growth Marketing, Content Creator, or PR roles are your path.",
+            roles: ["Entry: Marketing Coordinator", "Advanced: CMO, Brand Strategist"],
+            skills: ["Learn SEO", "Practice copywriting", "Study analytics"],
+            resources: ["HubSpot Academy", "Google Analytics certification"]
+          },
+          leader: {
+            title: "Strategic Captain",
+            description: "You guide teams and strategy. Product Manager, Entrepreneur, or Executive roles suit you.",
+            roles: ["Entry: Associate PM", "Advanced: CEO, Strategy Director"],
+            skills: ["Study leadership frameworks", "Practice public speaking", "Learn finance"],
+            resources: ["Harvard Business Review", "Toastmasters"]
+          },
+          operator: {
+            title: "Execution Maestro",
+            description: "You optimize processes. Operations Manager or Project Manager roles are ideal.",
+            roles: ["Entry: Operations Coordinator", "Advanced: COO, Supply Chain Manager"],
+            skills: ["Learn project management tools", "Study Lean Six Sigma", "Practice time management"],
+            resources: ["PMI certifications", "Trello/Asana tutorials"]
           }
         };
 
-        img.onerror = function () {
-          console.error("Error loading logo image");
-          alert("Failed to load logo for PDF. Generating PDF without logo.");
-
-          // Generate PDF without logo
-          const { jsPDF } = window.jspdf;
-          const doc = new jsPDF();
-          let yPos = 20;
-
-          const careerPaths = {
-            analyst: {
-              title: "Insight Architect",
-              description: "You thrive on data and clarity. Careers like Data Scientist, Business Analyst, or Researcher suit you.",
-              roles: ["Entry: Data Analyst", "Advanced: Data Scientist, Machine Learning Engineer"],
-              skills: ["Learn Python/R", "Take a Data Science course (e.g., Coursera)", "Practice SQL"],
-              resources: ["Coursera Data Science", "Kaggle competitions"]
-            },
-            builder: {
-              title: "System Engineer",
-              description: "You love building solutions. Software Engineer, DevOps, or Product Developer roles are ideal.",
-              roles: ["Entry: Junior Developer", "Advanced: Software Architect, CTO"],
-              skills: ["Learn JavaScript/Python", "Build a GitHub portfolio", "Explore cloud platforms"],
-              resources: ["freeCodeCamp", "AWS certifications"]
-            },
-            designer: {
-              title: "Experience Creator",
-              description: "You create user-friendly designs. UX/UI Designer or Graphic Designer roles fit you.",
-              roles: ["Entry: UI Designer", "Advanced: UX Lead, Creative Director"],
-              skills: ["Learn Figma", "Study design principles", "Build a portfolio"],
-              resources: ["Dribbble for inspiration", "Coursera UX Design"]
-            },
-            marketer: {
-              title: "Growth Catalyst",
-              description: "You excel at communication. Growth Marketing, Content Creator, or PR roles are your path.",
-              roles: ["Entry: Marketing Coordinator", "Advanced: CMO, Brand Strategist"],
-              skills: ["Learn SEO", "Practice copywriting", "Study analytics"],
-              resources: ["HubSpot Academy", "Google Analytics certification"]
-            },
-            leader: {
-              title: "Strategic Captain",
-              description: "You guide teams and strategy. Product Manager, Entrepreneur, or Executive roles suit you.",
-              roles: ["Entry: Associate PM", "Advanced: CEO, Strategy Director"],
-              skills: ["Study leadership frameworks", "Practice public speaking", "Learn finance"],
-              resources: ["Harvard Business Review", "Toastmasters"]
-            },
-            operator: {
-              title: "Execution Maestro",
-              description: "You optimize processes. Operations Manager or Project Manager roles are ideal.",
-              roles: ["Entry: Operations Coordinator", "Advanced: COO, Supply Chain Manager"],
-              skills: ["Learn project management tools", "Study Lean Six Sigma", "Practice time management"],
-              resources: ["PMI certifications", "Trello/Asana tutorials"]
-            }
-          };
-
+        // Function to generate PDF content
+        function generatePDFContent() {
           doc.setFontSize(16);
           doc.text("Career Clarity Quest - Action Plan", pageWidth / 2, yPos, { align: 'center' });
           yPos += 10;
@@ -631,11 +555,32 @@
           doc.text(`Reflection: Consider how your aspiration (“${aspiration}”) aligns with ${careerPaths[primary].title} or ${careerPaths[secondary].title} roles.`, 20, yPos, { maxWidth: pageWidth - 40 });
 
           doc.save('Career_Action_Plan.pdf');
-          console.log("PDF downloaded successfully without logo");
+          console.log("PDF downloaded successfully");
+        }
+
+        // Attempt to add logo
+        const img = new Image();
+        img.crossOrigin = 'Anonymous';
+        img.src = logoUrl;
+
+        img.onload = function () {
+          try {
+            doc.addImage(img, 'JPEG', logoX, yPos, logoWidth, logoHeight);
+            yPos += logoHeight + 10;
+            generatePDFContent();
+          } catch (error) {
+            console.error("Error adding logo to PDF:", error);
+            generatePDFContent(); // Proceed without logo
+          }
+        };
+
+        img.onerror = function () {
+          console.error("Error loading logo image:", logoUrl);
+          generatePDFContent(); // Proceed without logo
         };
       } catch (error) {
-        console.error("Error initiating PDF download:", error);
-        alert("Error initiating PDF download. Please check the console for details.");
+        console.error("Error generating PDF:", error);
+        alert("Failed to generate PDF. Please check the console for details or try again.");
       }
     }
   </script>
