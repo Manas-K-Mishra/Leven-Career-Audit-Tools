@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Career Clarity Quest</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f9f9f9;
+      padding: 2rem;
+      color: #333;
+      margin: 0;
+    }
+    .container {
+      max-width: 900px;
+      width: 100%;
+      background: #fff;
+      margin: 0 auto;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.05);
+      box-sizing: border-box;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .question {
+      display: none;
+      margin-bottom: 1.5rem;
+    }
+    .question.active {
+      display: block;
+    }
+    label {
+      display: block;
+      margin: 0.5rem 0;
+    }
+    button {
+      margin: 0.5rem;
+      background: #0b3d26;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      min-width: 120px;
+      min-height: 44px;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .result {
+      margin-top: 2rem;
+      padding: 1rem;
+      border-left: 4px solid #0b3d26;
+      background: #e4f0ea;
+      border-radius: 8px;
+      display: none;
+    }
+    .dashboard {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #f0f8f5;
+      border-radius: 8px;
+      display: none;
+    }
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+    }
+    .intro-screen {
+      text-align: center;
+      padding: 2rem;
+    }
+    .intro-screen img {
+      max-height: 80px;
+      margin-bottom: 1rem;
+    }
+    #quizForm {
+      display: none;
+    }
+    .progress-bar {
+      width: 100%;
+      background: #e0e0e0;
+      height: 10px;
+      border-radius: 5px;
+      margin-bottom: 1rem;
+    }
+    .progress {
+      height: 100%;
+      background: #0b3d26;
+      border-radius: 5px;
+      transition: width 0.3s;
+    }
+    canvas {
+      margin-top: 1rem;
+      max-width: 100%;
+      max-height: 300px;
+    }
+    .strengths-weaknesses {
+      margin-top: 1rem;
+    }
+    .strengths-weaknesses ul {
+      list-style-type: disc;
+      margin-left: 20px;
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 1rem;
+        max-width: 100%;
+      }
+      button {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        min-width: 100px;
+        min-height: 40px;
+      }
+      input[type="radio"] {
+        width: 18px;
+        height: 18px;
+        margin-right: 8px;
+      }
+      label {
+        font-size: 0.9rem;
+      }
+      canvas {
+        max-height: 250px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="intro-screen" id="introScreen">
+      <img src="https://manas-k-mishra.github.io/Leven-Career-Audit-Tools/leven-logo.jpg" alt="Leven Squad Logo" />
+      <h2>Career Clarity Quest</h2>
+      <p>Embark on a personalized journey to uncover your career strengths, goals, and next steps with dynamic questions and tailored insights.</p>
+      <button id="startBtn">Start Quest</button>
+    </div>
+
+    <form id="quizForm">
+      <div class="progress-bar"><div class="progress" id="progress"></div></div>
+
+      <div class="question active" data-type="core">
+        <strong>1. What excites you the most about work?</strong>
+        <label><input type="radio" name="q1" value="analyst"> Finding patterns in complex data</label>
+        <label><input type="radio" name="q1" value="builder"> Building reliable systems or tools</label>
+        <label><input type="radio" name="q1" value="designer"> Creating intuitive designs</label>
+        <label><input type="radio" name="q1" value="marketer"> Crafting persuasive stories</label>
+        <label><input type="radio" name="q1" value="leader"> Leading teams to success</label>
+        <label><input type="radio" name="q1" value="operator"> Streamlining operations</label>
+      </div>
+
+      <div class="question" data-type="core">
+        <strong>2. What’s your strongest skill?</strong>
+        <label><input type="radio" name="q2" value="analyst"> Data analysis and insights</label>
+        <label><input type="radio" name="q2" value="builder"> Technical problem-solving</label>
+        <label><input type="radio" name="q2" value="designer"> Visual or UX design</label>
+        <label><input type="radio" name="q2" value="marketer"> Communication and persuasion</label>
+        <label><input type="radio" name="q2" value="leader"> Strategic planning</label>
+        <label><input type="radio" name="q2" value="operator"> Process optimization</label>
+      </div>
+
+      <div class="question" data-type="core">
+        <strong>3. What’s most important in your career?</strong>
+        <label><input type="radio" name="q3" value="analyst"> Solving complex problems</label>
+        <label><input type="radio" name="q3" value="builder"> Building impactful solutions</label>
+        <label><input type="radio" name="q3" value="designer"> Creative expression</label>
+        <label><input type="radio" name="q3" value="marketer"> Influencing audiences</label>
+        <label><input type="radio" name="q3" value="leader"> Driving team success</label>
+        <label><input type="radio" name="q3" value="operator"> Efficiency and stability</label>
+      </div>
+
+      <div class="question" data-type="scenario">
+        <strong>4. Scenario: You’re offered two jobs. Which do you choose?</strong>
+        <label><input type="radio" name="q4" value="analyst"> Data analyst at a large firm, high pay, repetitive tasks</label>
+        <label><input type="radio" name="q4" value="builder"> Developer at a startup, lower pay, high impact</label>
+        <label><input type="radio" name="q4" value="designer"> Designer at an agency, moderate pay</label>
+        <label><input type="radio" name="q4" value="marketer"> Marketing role with travel, variable pay</label>
+        <label><input type="radio" name="q4" value="leader"> Leadership role at a nonprofit, modest pay</label>
+        <label><input type="radio" name="q4" value="operator"> Operations role, good benefits</label>
+      </div>
+
+      <div class="question" data-type="core">
+        <strong>5. What’s your education or learning focus?</strong>
+        <label><input type="radio" name="q5" value="analyst"> STEM or data-related studies</label>
+        <label><input type="radio" name="q5" value="builder"> Coding or technical training</label>
+        <label><input type="radio" name="q5" value="designer"> Design or creative arts</label>
+        <label><input type="radio" name="q5" value="marketer"> Marketing or communications</label>
+        <label><input type="radio" name="q5" value="leader"> Business or leadership studies</label>
+        <label><input type="radio" name="q5" value="operator"> Operations or general studies</label>
+      </div>
+
+      <div class="question" data-type="adaptive" data-depends="analyst">
+        <strong>6. How do you approach data challenges?</strong>
+        <label><input type="radio" name="q6" value="analyst"> Use statistical tools like Python or R</label>
+        <label><input type="radio" name="q6" value="analyst"> Build custom dashboards</label>
+        <label><input type="radio" name="q6" value="analyst"> Collaborate with teams for insights</label>
+      </div>
+
+      <div class="question" data-type="adaptive" data-depends="builder">
+        <strong>6. How do you tackle technical problems?</strong>
+        <label><input type="radio" name="q6" value="builder"> Prototype quickly and iterate</label>
+        <label><input type="radio" name="q6" value="builder"> Research existing frameworks</label>
+        <label><input type="radio" name="q6" value="builder"> Automate repetitive tasks</label>
+      </div>
+
+      <div class="question" data-type="core">
+        <strong>7. What’s your ideal work environment?</strong>
+        <label><input type="radio" name="q7" value="analyst"> Quiet, data-focused space</label>
+        <label><input type="radio" name="q7" value="builder"> Collaborative tech hub</label>
+        <label><input type="radio" name="q7" value="designer"> Creative, flexible studio</label>
+        <label><input type="radio" name="q7" value="marketer"> Dynamic, client-facing office</label>
+        <label><input type="radio" name="q7" value="leader"> Strategic, meeting-driven space</label>
+        <label><input type="radio" name="q7" value="operator"> Structured, process-oriented office</label>
+      </div>
+
+      <div class="question" data-type="core">
+        <strong>8. A mentor offers you a career pivot. What do you choose?</strong>
+        <label><input type="radio" name="q8" value="analyst"> Data science bootcamp</label>
+        <label><input type="radio" name="q8" value="builder"> Software engineering internship</label>
+        <label><input type="radio" name="q8" value="designer"> UX/UI design course</label>
+        <label><input type="radio" name="q8" value="marketer"> Digital marketing apprenticeship</label>
+        <label><input type="radio" name="q8" value="leader"> Leadership development program</label>
+        <label><input type="radio" name="q8" value="operator"> Operations management training</label>
+      </div>
+
+      <div class="question" data-type="core">
+        <strong>9. What’s your long-term career vision?</strong>
+        <label><input type="radio" name="q9" value="analyst"> Lead data-driven decisions</label>
+        <label><input type="radio" name="q9" value="builder"> Create innovative tech</label>
+        <label><input type="radio" name="q9" value="designer"> Design user-centric products</label>
+        <label><input type="radio" name="q9" value="marketer"> Shape brand narratives</label>
+        <label><input type="radio" name="q9" value="leader"> Lead a company or team</label>
+        <label><input type="radio" name="q9" value="operator"> Optimize global operations</label>
+      </div>
+
+      <div class="question" data-type="core">
+        <strong>10. What’s your ultimate career motivation?</strong>
+        <label><input type="radio" name="q10" value="analyst"> Solving complex problems with data</label>
+        <label><input type="radio" name="q10" value="builder"> Creating innovative technology</label>
+        <label><input type="radio" name="q10" value="designer"> Designing user-centric solutions</label>
+        <label><input type="radio" name="q10" value="marketer"> Influencing and engaging audiences</label>
+        <label><input type="radio" name="q10" value="leader"> Guiding teams to achieve big goals</label>
+        <label><input type="radio" name="q10" value="operator"> Ensuring efficient and smooth operations</label>
+      </div>
+
+      <div class="navigation">
+        <button type="button" id="prevBtn" style="display:none;">Back</button>
+        <button type="button" id="nextBtn">Next</button>
+      </div>
+
+      <button type="button" id="submitBtn" style="display:none;">Reveal My Career Path</button>
+    </form>
+
+    <div class="result" id="resultBox"></div>
+    <div class="dashboard" id="dashboardBox">
+      <h3>Your Career Dashboard</h3>
+      <div class="strengths-weaknesses">
+        <strong>Strengths:</strong>
+        <ul id="strengthsList"></ul>
+        <strong>Weaknesses:</strong>
+        <ul id="weaknessesList"></ul>
+      </div>
+      <button id="downloadBtn">Download Career Action Plan</button>
+    </div>
+    <canvas id="resultChart"></canvas>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script>
+    const { jsPDF } = window.jspdf;
+
+    // Randomization functions
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function randomizeOptions() {
+      const questions = document.querySelectorAll('.question[data-type="core"], .question[data-type="scenario"]');
+      questions.forEach(question => {
+        const labels = Array.from(question.querySelectorAll('label'));
+        const shuffledLabels = shuffleArray(labels);
+        labels.forEach(label => label.remove());
+        const questionText = question.querySelector('strong');
+        shuffledLabels.forEach(label => question.insertBefore(label, questionText.nextSibling));
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', randomizeOptions);
+
+    function startQuiz(event) {
+      event.preventDefault();
+      const introScreen = document.getElementById("introScreen");
+      const quizForm = document.getElementById("quizForm");
+      if (introScreen && quizForm) {
+        introScreen.style.display = "none";
+        quizForm.style.display = "block";
+        showStep(0);
+        updateProgress();
+      }
+    }
+
+    const form = document.getElementById('quizForm');
+    const questions = document.querySelectorAll('.question');
+    const resultBox = document.getElementById('resultBox');
+    const dashboardBox = document.getElementById('dashboardBox');
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const progress = document.getElementById('progress');
+    let currentStep = 0;
+    let visibleQuestions = Array.from(questions);
+    let responses = {};
+
+    function updateProgress() {
+      const percent = (currentStep / (visibleQuestions.length - 1)) * 100;
+      progress.style.width = `${percent}%`;
+    }
+
+    function filterAdaptiveQuestions() {
+      const scores = { analyst: 0, builder: 0, designer: 0, marketer: 0, leader: 0, operator: 0 };
+      for (let [key, value] of Object.entries(responses)) {
+        if (key !== 'q10' && key !== 'q6') scores[value]++;
+      }
+      const topTrait = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
+
+      visibleQuestions = Array.from(questions).filter(q => {
+        if (q.dataset.type !== 'adaptive') return true;
+        return q.dataset.depends === topTrait;
+      });
+
+      questions.forEach(q => {
+        q.style.display = 'none';
+        q.classList.remove('active');
+      });
+
+      visibleQuestions.forEach((q, index) => {
+        q.style.display = index === currentStep ? 'block' : 'none';
+        q.classList.toggle('active', index === currentStep);
+      });
+
+      console.log(`Filtered questions for trait: ${topTrait}, visible questions: ${visibleQuestions.length}`);
+    }
+
+    function showStep(step) {
+      questions.forEach(q => {
+        q.style.display = 'none';
+        q.classList.remove('active');
+      });
+
+      if (visibleQuestions[step]) {
+        visibleQuestions[step].style.display = 'block';
+        visibleQuestions[step].classList.add('active');
+      }
+
+      prevBtn.style.display = step > 0 ? 'inline-block' : 'none';
+      nextBtn.style.display = step < visibleQuestions.length - 1 ? 'inline-block' : 'none';
+      submitBtn.style.display = step === visibleQuestions.length - 1 ? 'inline-block' : 'none';
+      updateProgress();
+    }
+
+    const startBtn = document.getElementById('startBtn');
+    if (startBtn) startBtn.addEventListener('click', startQuiz);
+
+    nextBtn.addEventListener('click', () => {
+      const currentQuestion = visibleQuestions[currentStep];
+      const input = currentQuestion.querySelector('input[type="radio"]:checked');
+      if (!input) {
+        alert('Please select an option before proceeding.');
+        return;
+      }
+      const name = currentQuestion.querySelector('input').name;
+      responses[name] = input.value;
+
+      if (currentStep === 4) {
+        filterAdaptiveQuestions();
+        currentStep++;
+        showStep(currentStep);
+      } else if (currentStep < visibleQuestions.length - 1) {
+        currentStep++;
+        showStep(currentStep);
+      }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      if (currentStep > 0) {
+        currentStep--;
+        showStep(currentStep);
+      }
+    });
+
+    function handleSubmission() {
+      try {
+        for (let i = 0; i < visibleQuestions.length; i++) {
+          const question = visibleQuestions[i];
+          const selected = question.querySelector('input[type="radio"]:checked');
+          if (!selected) {
+            alert(`Please answer question ${i + 1} before submitting.`);
+            showStep(i);
+            return;
+          }
+        }
+
+        const scores = { analyst: 0, builder: 0, designer: 0, marketer: 0, leader: 0, operator: 0 };
+        const weights = { q3: 1.5, q4: 2, q9: 1.5 };
+        const formData = new FormData(form);
+
+        for (let [key, value] of formData.entries()) {
+          const weight = weights[key] || 1;
+          scores[value] += weight;
+        }
+
+        const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+        const primary = sorted[0][0];
+        const secondary = sorted[1][0];
+
+        const careerPaths = {
+          analyst: {
+            title: "Insight Architect",
+            description: "You excel at uncovering insights from data, ideal for roles like Data Scientist or Business Analyst.",
+            roles: ["Entry: Data Analyst", "Mid: Data Scientist", "Advanced: Machine Learning Engineer"],
+            skills: ["Master Python/R", "Learn SQL", "Explore data visualization tools"],
+            resources: ["Coursera Data Science", "Kaggle competitions", "Tableau tutorials"],
+            strengths: ["Analytical thinking", "Problem-solving", "Attention to detail"],
+            weaknesses: ["May over-rely on data", "Could improve interpersonal skills"]
+          },
+          builder: {
+            title: "System Engineer",
+            description: "You love creating solutions, perfect for Software Engineer or DevOps roles.",
+            roles: ["Entry: Junior Developer", "Mid: Software Engineer", "Advanced: CTO"],
+            skills: ["Learn JavaScript/Python", "Build GitHub projects", "Study cloud platforms"],
+            resources: ["freeCodeCamp", "AWS certifications", "LeetCode practice"],
+            strengths: ["Technical expertise", "Solution-building", "Innovation"],
+            weaknesses: ["May focus too much on details", "Could enhance collaboration"]
+          },
+          designer: {
+            title: "Experience Creator",
+            description: "You craft user-friendly designs, suited for UX/UI Designer or Creative Director roles.",
+            roles: ["Entry: UI Designer", "Mid: UX Designer", "Advanced: Creative Director"],
+            skills: ["Master Figma", "Learn design principles", "Build a portfolio"],
+            resources: ["Dribbble inspiration", "Coursera UX Design", "Adobe XD tutorials"],
+            strengths: ["Creativity", "User empathy", "Visual storytelling"],
+            weaknesses: ["May avoid technical tasks", "Could improve time management"]
+          },
+          marketer: {
+            title: "Growth Catalyst",
+            description: "You shine in communication, ideal for Growth Marketing or Brand Strategist roles.",
+            roles: ["Entry: Marketing Coordinator", "Mid: Digital Marketer", "Advanced: CMO"],
+            skills: ["Learn SEO", "Practice copywriting", "Study analytics"],
+            resources: ["HubSpot Academy", "Google Analytics certification", "Moz SEO courses"],
+            strengths: ["Persuasion", "Communication", "Adaptability"],
+            weaknesses: ["May lack technical depth", "Could refine strategic focus"]
+          },
+          leader: {
+            title: "Strategic Captain",
+            description: "You guide teams and strategy, perfect for Product Manager or Executive roles.",
+            roles: ["Entry: Associate PM", "Mid: Product Manager", "Advanced: CEO"],
+            skills: ["Study leadership frameworks", "Practice public speaking", "Learn finance"],
+            resources: ["Harvard Business Review", "Toastmasters", "Coursera MBA courses"],
+            strengths: ["Strategic vision", "Team leadership", "Decision-making"],
+            weaknesses: ["May delegate too much", "Could improve technical skills"]
+          },
+          operator: {
+            title: "Execution Maestro",
+            description: "You optimize processes, ideal for Operations Manager or Project Manager roles.",
+            roles: ["Entry: Operations Coordinator", "Mid: Project Manager", "Advanced: COO"],
+            skills: ["Learn project management tools", "Study Lean Six Sigma", "Practice time management"],
+            resources: ["PMI certifications", "Trello/Asana tutorials", "Coursera Operations"],
+            strengths: ["Organization", "Efficiency", "Process improvement"],
+            weaknesses: ["May resist change", "Could enhance creativity"]
+          }
+        };
+
+        const resultText = `
+          <strong>Your Career Path: ${careerPaths[primary].title} with ${careerPaths[secondary].title} tendencies</strong><br>
+          <p>${careerPaths[primary].description}</p>
+          <p><strong>Secondary Fit:</strong> ${careerPaths[secondary].description}</p>
+          <p><strong>Recommended Roles:</strong> ${careerPaths[primary].roles.join(", ")}</p>
+          <p><strong>Skills to Develop:</strong> ${careerPaths[primary].skills.join(", ")}</p>
+          <p><strong>Resources:</strong> ${careerPaths[primary].resources.map(r => `<a href="https://www.${r.split(' ')[0].toLowerCase()}.com" target="_blank">${r}</a>`).join(", ")}</p>
+        `;
+        resultBox.innerHTML = resultText;
+        resultBox.style.display = 'block';
+
+        const strengthsList = document.getElementById('strengthsList');
+        const weaknessesList = document.getElementById('weaknessesList');
+        strengthsList.innerHTML = careerPaths[primary].strengths.map(s => `<li>${s}</li>`).join('');
+        weaknessesList.innerHTML = careerPaths[primary].weaknesses.map(w => `<li>${w}</li>`).join('');
+        dashboardBox.style.display = 'block';
+
+        form.style.display = 'none';
+
+        try {
+          new Chart(document.getElementById('resultChart'), {
+            type: 'radar',
+            data: {
+              labels: ['Analyst', 'Builder', 'Designer', 'Marketer', 'Leader', 'Operator'],
+              datasets: [{
+                label: 'Your Career Profile',
+                data: [scores.analyst, scores.builder, scores.designer, scores.marketer, scores.leader, scores.operator],
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: '#0b3d26',
+                borderWidth: 2
+              }]
+            },
+            options: {
+              responsive: true,
+              scales: {
+                r: {
+                  beginAtZero: true,
+                  max: Math.max(...Object.values(scores)) + 1
+                }
+              },
+              plugins: {
+                legend: { position: 'top' },
+                title: { display: true, text: 'Your Career Profile Breakdown' }
+              }
+            }
+          });
+        } catch (error) {
+          console.error("Error rendering chart:", error);
+        }
+
+        downloadBtn.addEventListener('click', () => {
+          const doc = new jsPDF();
+          doc.addImage('https://manas-k-mishra.github.io/Leven-Career-Audit-Tools/leven-logo.jpg', 'JPEG', 85, 10, 40, 20);
+          doc.setFontSize(16);
+          doc.text('Career Clarity Quest - Action Plan', 20, 40);
+          doc.setFontSize(12);
+          doc.text(`Primary Path: ${careerPaths[primary].title}`, 20, 50);
+          doc.text(`Secondary Path: ${careerPaths[secondary].title}`, 20, 60);
+          doc.text('Description:', 20, 70);
+          doc.text(doc.splitTextToSize(careerPaths[primary].description, 170), 20, 80);
+          doc.text('Recommended Roles:', 20, 100);
+          doc.text(careerPaths[primary].roles.join(', '), 20, 110);
+          doc.text('Skills to Develop:', 20, 120);
+          doc.text(careerPaths[primary].skills.join(', '), 20, 130);
+          doc.text('Resources:', 20, 140);
+          doc.text(careerPaths[primary].resources.join(', '), 20, 150);
+          doc.text('Strengths:', 20, 160);
+          doc.text(careerPaths[primary].strengths.join(', '), 20, 170);
+          doc.text('Weaknesses:', 20, 180);
+          doc.text(careerPaths[primary].weaknesses.join(', '), 20, 190);
+          doc.save('Career_Action_Plan.pdf');
+        });
+      } catch (error) {
+        console.error("Submission error:", error);
+        alert("An error occurred while processing your results. Please try again.");
+      }
+    }
+
+    submitBtn.addEventListener('click', handleSubmission);
+  </script>
+</body>
+</html>
